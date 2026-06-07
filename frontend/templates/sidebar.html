@@ -1,0 +1,33 @@
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-icon">🪤</div>
+    <div>
+      <div class="brand-name">CANARY-FILE</div>
+      <div class="brand-sub">Deception Security</div>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <a href="/" class="nav-item {% if request.path == '/' %}active{% endif %}">
+      <span class="nav-icon">◈</span>
+      <span>Dashboard</span>
+    </a>
+    <a href="/files" class="nav-item {% if request.path == '/files' %}active{% endif %}">
+      <span class="nav-icon">⬡</span>
+      <span>Canary Files</span>
+    </a>
+    <a href="/incidents" class="nav-item {% if request.path == '/incidents' %}active{% endif %}">
+      <span class="nav-icon">◎</span>
+      <span>Incidents</span>
+    </a>
+    <a href="/settings" class="nav-item {% if request.path == '/settings' %}active{% endif %}">
+      <span class="nav-icon">◧</span>
+      <span>Settings</span>
+    </a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="footer-version">v1.0.0 — 2026</div>
+    <div class="footer-build">build by canary-sys</div>
+  </div>
+</aside>

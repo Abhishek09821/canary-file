@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Canary-File | Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/css/main.css">
+</head>
+<body>
+<div class="layout">
+  {% include 'sidebar.html' %}
+  <main class="main-content">
+    <div class="page-header">
+      <div>
+        <div class="breadcrumb">CANARY-FILE / DASHBOARD</div>
+        <h1 class="page-title">Threat Overview</h1>
+      </div>
+      <div class="header-actions">
+        <div class="monitor-status" id="monitorStatus">
+          <span class="status-dot" id="statusDot"></span>
+          <span id="statusText">Checking...</span>
+        </div>
+        <button class="btn btn-primary" id="toggleMonitor">—</button>
+      </div>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+      <div class="stat-card stat-red">
+        <div class="stat-icon">⚠</div>
+        <div class="stat-body">
+          <div class="stat-value" id="totalAlerts">—</div>
+          <div class="stat-label">Total Incidents</div>
+        </div>
+      </div>
+      <div class="stat-card stat-yellow">
+        <div class="stat-icon">🪤</div>
+        <div class="stat-body">
+          <div class="stat-value" id="totalFiles">—</div>
+          <div class="stat-label">Canary Files</div>
+        </div>
+      </div>
+      <div class="stat-card stat-green">
+        <div class="stat-icon">👁</div>
+        <div class="stat-body">
+          <div class="stat-value" id="activeMonitors">—</div>
+          <div class="stat-label">Active Monitors</div>
+        </div>
+      </div>
+      <div class="stat-card stat-orange">
+        <div class="stat-icon">🔴</div>
+        <div class="stat-body">
+          <div class="stat-value" id="highSeverity">—</div>
+          <div class="stat-label">High Severity</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="content-row">
+      <!-- Recent Incidents -->
+      <div class="card flex-2">
+        <div class="card-header">
+          <span class="card-title">Recent Incidents</span>
+          <a href="/incidents" class="card-link">View All →</a>
+        </div>
+        <div class="incident-table-wrap">
+          <table class="incident-table" id="recentTable">
+            <thead>
+              <tr>
+                <th>File</th><th>Event</th><th>Time</th><th>Device</th><th>Severity</th>
+              </tr>
+            </thead>
+            <tbody id="recentBody">
+              <tr><td colspan="5" class="empty-row">No incidents yet</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Event Breakdown -->
+      <div class="card flex-1">
+        <div class="card-header">
+          <span class="card-title">Event Types</span>
+        </div>
+        <div class="event-breakdown" id="eventBreakdown">
+          <div class="empty-state">No data yet</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Activity Bar Chart (last 7 days) -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Activity — Last 7 Days</span>
+      </div>
+      <div class="bar-chart" id="barChart">
+        <div class="empty-state">No activity data</div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script src="/static/js/main.js"></script>
+<script>
+async function loadDashboard() {
+  const r = await fetch('/api/stats');
+  const d = await r.json();
+
+  document.getElementById('totalAlerts').textContent = d.total_alerts;
+  document.getElementById('totalFiles').textContent = d.total_canary_files;
+  document.getElementById('activeMonitors').textContent = d.active_monitors;
+  document.getElementById('highSeverity').textContent = d.high_severity;
+
+  updateMonitorUI(d.monitoring_active);
+
+  // Recent incidents
+  const tbody = document.getElementById('recentBody');
+  if (d.recent_incidents && d.recent_incidents.length > 0) {
+    tbody.innerHTML = d.recent_incidents.map(i => `
+      <tr class="incident-row sev-${(i.severity||'').toLowerCase()}">
+        <td class="mono">${i.filename}</td>
+        <td><span class="event-badge">${i.event_type}</span></td>
+        <td class="mono dim">${i.timestamp}</td>
+        <td class="mono">${i.device_name || '—'}</td>
+        <td><span class="sev-badge sev-${(i.severity||'').toLowerCase()}">${i.severity}</span></td>
+      </tr>
+    `).join('');
+  }
+
+  // Event breakdown
+  const eb = document.getElementById('eventBreakdown');
+  const types = d.events_by_type || {};
+  const total = Object.values(types).reduce((a,b)=>a+b, 0) || 1;
+  if (Object.keys(types).length > 0) {
+    eb.innerHTML = Object.entries(types).map(([type, cnt]) => `
+      <div class="eb-row">
+        <span class="eb-label">${type}</span>
+        <div class="eb-bar-wrap">
+          <div class="eb-bar" style="width:${Math.round(cnt/total*100)}%"></div>
+        </div>
+        <span class="eb-count">${cnt}</span>
+      </div>
+    `).join('');
+  } else {
+    eb.innerHTML = '<div class="empty-state">No events recorded</div>';
+  }
+
+  // Bar chart
+  const bc = document.getElementById('barChart');
+  const days = d.daily_counts || [];
+  if (days.length > 0) {
+    const maxCnt = Math.max(...days.map(d=>d.cnt), 1);
+    bc.innerHTML = `<div class="bars">${days.map(d=>`
+      <div class="bar-col">
+        <div class="bar-fill" style="height:${Math.round(d.cnt/maxCnt*100)}%" title="${d.cnt} events"></div>
+        <div class="bar-day">${d.day ? d.day.slice(5) : ''}</div>
+      </div>
+    `).join('')}</div>`;
+  }
+}
+
+loadDashboard();
+setInterval(loadDashboard, 8000);
+</script>
+</body>
+</html>

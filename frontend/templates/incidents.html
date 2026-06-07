@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Canary-File | Incidents</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/css/main.css">
+</head>
+<body>
+<div class="layout">
+  {% include 'sidebar.html' %}
+  <main class="main-content">
+    <div class="page-header">
+      <div>
+        <div class="breadcrumb">CANARY-FILE / INCIDENTS</div>
+        <h1 class="page-title">Incident Log</h1>
+      </div>
+      <div class="header-actions">
+        <div class="monitor-status" id="monitorStatus">
+          <span class="status-dot" id="statusDot"></span>
+          <span id="statusText">Checking...</span>
+        </div>
+        <button class="btn btn-primary" id="toggleMonitor">—</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="filter-bar">
+          <button class="filter-btn active" data-sev="">All</button>
+          <button class="filter-btn" data-sev="HIGH">HIGH</button>
+          <button class="filter-btn" data-sev="MEDIUM">MEDIUM</button>
+          <button class="filter-btn" data-sev="LOW">LOW</button>
+        </div>
+        <button class="btn btn-danger btn-sm" id="clearAllBtn" style="margin-left:auto;">Clear All</button>
+        <span id="totalCount" style="font-family:var(--mono);font-size:10px;color:var(--text3);">— incidents</span>
+      </div>
+      <div class="incident-table-wrap">
+        <table class="incident-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>File</th>
+              <th>Event</th>
+              <th>Timestamp</th>
+              <th>User</th>
+              <th>Device</th>
+              <th>IP</th>
+              <th>Location</th>
+              <th>Severity</th>
+              <th>Alert</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="incidentBody">
+            <tr><td colspan="10" class="empty-row">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="pagination">
+        <button class="page-btn" id="prevBtn">← Prev</button>
+        <span class="page-info" id="pageInfo">Page 1</span>
+        <button class="page-btn" id="nextBtn">Next →</button>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Detail Modal -->
+<div class="modal-overlay hidden" id="detailModal">
+  <div class="modal">
+    <div class="modal-title">◎ Incident Details</div>
+    <div class="modal-body">
+      <div class="incident-detail-grid" id="detailGrid"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="document.getElementById('detailModal').classList.add('hidden')">Close</button>
+    </div>
+  </div>
+</div>
+
+<script src="/static/js/main.js"></script>
+<script>
+let currentPage = 1;
+let currentSev = '';
+const perPage = 20;
+
+async function loadIncidents() {
+  let url = `/api/incidents?page=${currentPage}&per_page=${perPage}`;
+  if (currentSev) url += `&severity=${currentSev}`;
+  const r = await fetch(url);
+  const d = await r.json();
+
+  document.getElementById('totalCount').textContent = `${d.total} incident${d.total !== 1 ? 's' : ''}`;
+  document.getElementById('pageInfo').textContent = `Page ${currentPage} / ${Math.ceil(d.total / perPage) || 1}`;
+
+  const tbody = document.getElementById('incidentBody');
+  if (!d.incidents.length) {
+    tbody.innerHTML = '<tr><td colspan="10" class="empty-row">No incidents found</td></tr>';
+    return;
+  }
+  tbody.innerHTML = d.incidents.map(i => `
+    <tr class="incident-row sev-${(i.severity||'').toLowerCase()}" style="cursor:pointer;" onclick="showDetail(${JSON.stringify(JSON.stringify(i))})">
+      <td class="mono dim">#${i.id}</td>
+      <td class="mono" style="color:var(--accent)">${i.filename}</td>
+      <td><span class="event-badge">${i.event_type}</span></td>
+      <td class="mono dim">${i.timestamp}</td>
+      <td class="mono">${i.username || '—'}</td>
+      <td class="mono">${i.device_name || '—'}</td>
+      <td class="mono dim">${i.public_ip || '—'}</td>
+      <td class="mono dim" style="font-size:10px;">${i.location || '—'}</td>
+      <td><span class="sev-badge sev-${(i.severity||'').toLowerCase()}">${i.severity}</span></td>
+      <td style="color:${i.alert_sent ? 'var(--green)' : 'var(--text3)'};font-family:var(--mono);font-size:10px;">${i.alert_sent ? '✓ Sent' : '—'}</td>
+      <td>
+        <button class="btn btn-danger btn-sm" onclick="event.stopPropagation();deleteInc(${i.id})">×</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function showDetail(jsonStr) {
+  const i = JSON.parse(jsonStr);
+  const fields = [
+    ['Incident ID', `#${i.id}`],
+    ['Filename', i.filename],
+    ['Event Type', i.event_type],
+    ['Severity', i.severity],
+    ['Timestamp', i.timestamp],
+    ['Username', i.username || '—'],
+    ['Device', i.device_name || '—'],
+    ['Public IP', i.public_ip || '—'],
+    ['OS', i.os_info || '—'],
+    ['Process', i.process_name || '—'],
+    ['Destination', i.destination || '—'],
+    ['Alert Sent', i.alert_sent ? 'Yes ✓' : 'No'],
+    ['Notes', i.notes || '—'],
+  ];
+  document.getElementById('detailGrid').innerHTML = fields.map(([k,v]) =>
+    `<div class="detail-key">${k}</div><div class="detail-val">${v}</div>`
+  ).join('');
+  document.getElementById('detailModal').classList.remove('hidden');
+}
+
+async function deleteInc(id) {
+  await fetch(`/api/incidents/${id}`, { method: 'DELETE' });
+  showToast('Incident removed', 'warn');
+  loadIncidents();
+}
+
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentSev = btn.dataset.sev;
+    currentPage = 1;
+    loadIncidents();
+  });
+});
+
+document.getElementById('prevBtn').addEventListener('click', () => { if (currentPage > 1) { currentPage--; loadIncidents(); } });
+document.getElementById('nextBtn').addEventListener('click', () => { currentPage++; loadIncidents(); });
+
+loadIncidents();
+setInterval(loadIncidents, 10000);
+</script>
+</body>
+</html>
+<script>
+document.getElementById('clearAllBtn').addEventListener('click', async () => {
+  if (!confirm('Delete ALL incidents? This cannot be undone.')) return;
+  await fetch('/api/incidents/clear', {method:'POST'});
+  showToast('All incidents cleared', 'warn');
+  loadIncidents();
+});
+</script>

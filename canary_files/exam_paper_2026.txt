@@ -1,0 +1,39 @@
+UNIVERSITY EXAMINATION - 2026
+Subject: Advanced Computer Networks (CS-501)
+Date: 30/06/2026    Time: 3 Hours    Max Marks: 100
+
+=== SECTION A - COMPULSORY (20 Marks) ===
+
+Q1. Answer all parts: (2 marks each)
+(a) Define OSI model and explain each layer briefly.
+(b) What is subnetting? Calculate subnet for 192.168.10.0/26
+(c) Explain TCP three-way handshake.
+(d) Difference between hub, switch, and router.
+(e) What is CIDR notation? Give examples.
+
+=== SECTION B - Attempt any 3 (60 Marks) ===
+
+Q2. (20 marks)
+(a) Explain OSPF routing protocol with diagram. Compare with RIP.
+(b) Describe BGP and its role in internet routing.
+
+Q3. (20 marks)
+(a) Explain TCP congestion control mechanisms.
+(b) Compare TCP vs UDP with real-world use cases.
+
+Q4. (20 marks)
+(a) Describe VLAN configuration on Cisco switches.
+(b) Explain STP (Spanning Tree Protocol).
+
+Q5. (20 marks)
+(a) Explain IPv6 addressing with diagram.
+(b) Describe transition mechanisms from IPv4 to IPv6.
+
+=== SECTION C - Case Study (20 Marks) ===
+
+Q6. A company has 500 employees across 3 floors. Design complete network topology...
+
+*** ANSWER KEY ATTACHED - INTERNAL USE ONLY ***
+Q1a: 7 layers - Physical, Data Link, Network, Transport, Session, Presentation, Application
+Q1b: 192.168.10.0 - 64 hosts per subnet, .0, .64, .128, .192
+Q1c: SYN -> SYN-ACK -> ACK sequence

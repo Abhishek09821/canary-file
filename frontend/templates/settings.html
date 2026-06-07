@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Canary-File | Settings</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/css/main.css">
+<style>
+.settings-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+@media(max-width:900px){.settings-grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="layout">
+  {% include 'sidebar.html' %}
+  <main class="main-content">
+    <div class="page-header">
+      <div>
+        <div class="breadcrumb">CANARY-FILE / SETTINGS</div>
+        <h1 class="page-title">Configuration</h1>
+      </div>
+      <div class="header-actions">
+        <div class="monitor-status">
+          <span class="status-dot" id="statusDot"></span>
+          <span id="statusText">Checking...</span>
+        </div>
+        <button class="btn btn-primary" id="toggleMonitor">—</button>
+      </div>
+    </div>
+
+    <div class="settings-grid">
+
+      <!-- Telegram -->
+      <div class="settings-section">
+        <div class="settings-title">📨 Telegram Alerts</div>
+        <div class="settings-row">
+          <label class="form-label">Bot Token</label>
+          <input class="form-input" id="tg_token" type="password" placeholder="110201543:AAHdq..." />
+          <div class="settings-desc">Get from @BotFather on Telegram</div>
+        </div>
+        <div class="settings-row">
+          <label class="form-label">Chat ID</label>
+          <input class="form-input" id="tg_chat" placeholder="-1001234567890" />
+          <div class="settings-desc">Use @userinfobot to find your Chat ID</div>
+        </div>
+        <div class="settings-row">
+          <div class="checkbox-row">
+            <input type="checkbox" id="tg_enabled" />
+            <label class="checkbox-label" for="tg_enabled">Enable Telegram alerts</label>
+          </div>
+        </div>
+        <button class="btn btn-ghost btn-sm" id="testTgBtn" style="margin-top:8px;">Send Test Alert</button>
+      </div>
+
+      <!-- WhatsApp -->
+      <div class="settings-section">
+        <div class="settings-title">💬 WhatsApp Alerts</div>
+
+        <!-- Twilio (already configured) -->
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:12px;margin-bottom:16px;">
+          <div style="font-family:var(--mono);font-size:10px;color:var(--accent);margin-bottom:6px;">TWILIO (CONFIGURED)</div>
+          <div class="settings-row" style="margin-bottom:10px;">
+            <label class="form-label">Account SID</label>
+            <input class="form-input" id="twilio_sid" type="password" placeholder="ACxxxxxxxxxxxxxxxx" />
+          </div>
+          <div class="settings-row" style="margin-bottom:10px;">
+            <label class="form-label">Auth Token</label>
+            <input class="form-input" id="twilio_token" type="password" placeholder="your_auth_token" />
+          </div>
+          <div class="settings-row" style="margin-bottom:10px;">
+            <label class="form-label">From Number</label>
+            <input class="form-input" id="twilio_from" placeholder="whatsapp:+14155238886" />
+          </div>
+          <div class="settings-row" style="margin-bottom:0;">
+            <label class="form-label">Your Number</label>
+            <input class="form-input" id="twilio_to" placeholder="whatsapp:+919876543210" />
+          </div>
+        </div>
+
+        <!-- CallMeBot (free alternative) -->
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:12px;">
+          <div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:8px;">CALLMEBOT (FREE — no account needed)</div>
+          <div style="font-size:11px;color:var(--text2);line-height:1.9;margin-bottom:12px;">
+            1. Save <strong style="color:var(--accent);">+34 644 90 36 27</strong> in contacts as "CallMeBot"<br>
+            2. Send <code style="color:var(--accent);">I allow callmebot to send me messages</code> on WhatsApp<br>
+            3. You'll receive your <strong style="color:var(--accent);">apikey</strong> — paste below<br>
+            <span style="color:var(--text3);font-size:10px;">If Twilio is configured, it takes priority. CallMeBot is used as fallback.</span>
+          </div>
+          <div class="settings-row" style="margin-bottom:10px;">
+            <label class="form-label">Your WhatsApp Number</label>
+            <input class="form-input" id="whatsapp_phone" placeholder="919876543210" />
+            <div class="settings-desc">Country code + number, no + sign. India = 91XXXXXXXXXX</div>
+          </div>
+          <div class="settings-row" style="margin-bottom:0;">
+            <label class="form-label">CallMeBot API Key</label>
+            <input class="form-input" id="whatsapp_apikey" type="password" placeholder="123456" />
+            <div class="settings-desc">Received via WhatsApp from CallMeBot</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Email -->
+      <div class="settings-section">
+        <div class="settings-title">📧 Email Alerts</div>
+        <div class="settings-row">
+          <label class="form-label">SMTP Host</label>
+          <input class="form-input" id="smtp_host" placeholder="smtp.gmail.com" />
+        </div>
+        <div class="settings-row">
+          <label class="form-label">SMTP Port</label>
+          <input class="form-input" id="smtp_port" placeholder="587" />
+        </div>
+        <div class="settings-row">
+          <label class="form-label">Username</label>
+          <input class="form-input" id="smtp_user" placeholder="yourmail@gmail.com" />
+        </div>
+        <div class="settings-row">
+          <label class="form-label">App Password</label>
+          <input class="form-input" id="smtp_pass" type="password" placeholder="Gmail App Password" />
+          <div class="settings-desc">Gmail → Google Account → Security → App Passwords</div>
+        </div>
+        <div class="settings-row">
+          <label class="form-label">Alert Recipient</label>
+          <input class="form-input" id="alert_email" placeholder="alert@yourmail.com" />
+        </div>
+        <div class="settings-row">
+          <div class="checkbox-row">
+            <input type="checkbox" id="email_enabled" />
+            <label class="checkbox-label" for="email_enabled">Enable Email alerts</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Webcam + Monitoring -->
+      <div class="settings-section">
+        <div class="settings-title">📸 Webcam & Monitoring</div>
+        <div class="settings-row">
+          <div class="checkbox-row">
+            <input type="checkbox" id="webcam_enabled" />
+            <label class="checkbox-label" for="webcam_enabled">Enable webcam snapshot on trigger</label>
+          </div>
+          <div class="settings-desc" style="margin-top:4px;">Takes a photo when canary file is opened/copied. Requires camera permission.</div>
+        </div>
+
+        <div style="margin:14px 0;border-top:1px solid var(--border);"></div>
+
+        <div class="settings-row">
+          <label class="form-label">Watch Directory</label>
+          <input class="form-input" id="watch_dir" placeholder="/Users/you/Documents/monitored" />
+          <div class="settings-desc">Leave blank to use default canary_files/ folder</div>
+        </div>
+
+        <div style="margin-top:16px;padding:14px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;">
+          <div style="font-family:var(--mono);font-size:10px;color:var(--accent);margin-bottom:8px;">WHAT GETS DETECTED</div>
+          <div style="font-family:var(--mono);font-size:10px;color:var(--text2);line-height:2;">
+            ✓ OPENED — file accessed/read<br>
+            ✓ MODIFIED — content changed<br>
+            ✓ DELETED — file removed<br>
+            ✓ MOVED — file renamed/moved<br>
+            ✓ COPIED — file duplicated
+          </div>
+        </div>
+
+        <!-- Snapshots preview -->
+        <div style="margin-top:14px;">
+          <div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:8px;text-transform:uppercase;letter-spacing:.08em;">Recent Captures</div>
+          <div id="snapshotGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;">
+            <div style="color:var(--text3);font-size:10px;grid-column:1/-1;">No snapshots yet</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Save Bar -->
+    <div class="save-bar">
+      <span class="save-msg" id="saveMsg" style="opacity:0;">Settings saved ✓</span>
+      <button class="btn btn-ghost" onclick="loadSettings()">Reset</button>
+      <button class="btn btn-primary" id="saveBtn">Save Settings</button>
+    </div>
+
+  </main>
+</div>
+
+<script src="/static/js/main.js"></script>
+<script>
+async function loadSettings() {
+  const r = await fetch('/api/settings');
+  const d = await r.json();
+  document.getElementById('tg_token').placeholder   = d.telegram_token ? '(configured)' : 'bot token...';
+  document.getElementById('tg_chat').value          = d.telegram_chat_id || '';
+  document.getElementById('tg_enabled').checked     = d.alert_telegram === '1';
+  document.getElementById('smtp_host').value        = d.smtp_host || '';
+  document.getElementById('smtp_port').value        = d.smtp_port || '587';
+  document.getElementById('smtp_user').value        = d.smtp_user || '';
+  document.getElementById('alert_email').value      = d.alert_email || '';
+  document.getElementById('email_enabled').checked  = d.alert_email_enabled === '1';
+  document.getElementById('watch_dir').value        = d.watch_directory || '';
+  document.getElementById('webcam_enabled').checked  = d.webcam_enabled === '1';
+  document.getElementById('twilio_from').value       = d.twilio_from || '';
+  document.getElementById('twilio_to').value         = d.twilio_to || '';
+  document.getElementById('whatsapp_phone').value    = d.whatsapp_phone || '';
+  document.getElementById('whatsapp_apikey').placeholder = d.whatsapp_apikey ? '(configured)' : 'API key...';
+  loadSnapshots();
+}
+
+async function loadSnapshots() {
+  const r = await fetch('/api/snapshots');
+  const snaps = await r.json();
+  const grid = document.getElementById('snapshotGrid');
+  if (!snaps.length) {
+    grid.innerHTML = '<div style="color:var(--text3);font-size:10px;grid-column:1/-1;">No snapshots yet</div>';
+    return;
+  }
+  grid.innerHTML = snaps.slice(0,6).map(s => `
+    <a href="${s.url}" target="_blank">
+      <img src="${s.url}" style="width:100%;height:60px;object-fit:cover;border-radius:4px;border:1px solid var(--border);" title="${s.filename}" />
+    </a>
+  `).join('');
+}
+
+document.getElementById('saveBtn').addEventListener('click', async () => {
+  const payload = {
+    telegram_token:      document.getElementById('tg_token').value.trim(),
+    telegram_chat_id:    document.getElementById('tg_chat').value.trim(),
+    alert_telegram:      document.getElementById('tg_enabled').checked ? '1' : '0',
+    smtp_host:           document.getElementById('smtp_host').value.trim(),
+    smtp_port:           document.getElementById('smtp_port').value.trim(),
+    smtp_user:           document.getElementById('smtp_user').value.trim(),
+    smtp_pass:           document.getElementById('smtp_pass').value.trim(),
+    alert_email:         document.getElementById('alert_email').value.trim(),
+    alert_email_enabled: document.getElementById('email_enabled').checked ? '1' : '0',
+    watch_directory:     document.getElementById('watch_dir').value.trim(),
+    webcam_enabled:      document.getElementById('webcam_enabled').checked ? '1' : '0',
+    twilio_sid:          document.getElementById('twilio_sid').value.trim(),
+    twilio_token:        document.getElementById('twilio_token').value.trim(),
+    twilio_from:         document.getElementById('twilio_from').value.trim(),
+    twilio_to:           document.getElementById('twilio_to').value.trim(),
+    whatsapp_phone:      document.getElementById('whatsapp_phone').value.trim(),
+    whatsapp_apikey:     document.getElementById('whatsapp_apikey').value.trim(),
+  };
+  await fetch('/api/settings', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+  const msg = document.getElementById('saveMsg');
+  msg.style.opacity = '1'; setTimeout(()=>msg.style.opacity='0', 3000);
+  showToast('Settings saved', 'ok');
+});
+
+document.getElementById('testTgBtn').addEventListener('click', async () => {
+  const btn = document.getElementById('testTgBtn');
+  btn.textContent = 'Sending...'; btn.disabled = true;
+  const r = await fetch('/api/test-telegram', {method:'POST'});
+  const d = await r.json();
+  showToast(d.success ? 'Test sent! ✓' : 'Failed — check token & chat ID', d.success ? 'ok' : 'err');
+  btn.textContent = 'Send Test Alert'; btn.disabled = false;
+});
+
+loadSettings();
+</script>
+</body>
+</html>
