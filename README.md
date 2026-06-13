@@ -8,7 +8,7 @@ instant Telegram/Email alert with full evidence collection.
 
 ## ⚡ Quick Start (Windows)
 
-1. Install Python 3.9+ from python.org
+1. Install Python 3.11+ from python.org
 2. Double-click `start.bat`
 3. Open http://127.0.0.1:5000 in browser
 
