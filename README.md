@@ -12,7 +12,7 @@ instant Telegram/Email alert with full evidence collection.
 2. Double-click `start.bat`
 3. Open http://127.0.0.1:5000 in browser
 
-## ⚡ Quick Start (Manual)
+## Quick Start (Manual)
 
 ```bash
 pip install -r requirements.txt
