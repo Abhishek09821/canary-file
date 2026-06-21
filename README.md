@@ -1,4 +1,4 @@
-# 🪤 Canary-File — Cyber Theft Detection & Alert System
+# Canary-File — Cyber Theft Detection & Alert System
 
 A deception-based cybersecurity tool that places strategically crafted decoy files
 in your directories. Any unauthorized access, copy, or move attempt triggers an
@@ -6,7 +6,7 @@ instant Telegram/Email alert with full evidence collection.
 
 ---
 
-## ⚡ Quick Start (Windows)
+## Quick Start (Windows)
 
 1. Install Python 3.11+ from python.org
 2. Double-click `start.bat`
@@ -21,7 +21,7 @@ python app.py
 
 ---
 
-## 🛠 Setup Guide
+## Setup Guide
 
 ### Step 1 — Configure Telegram Bot (Recommended)
 
@@ -54,7 +54,7 @@ python app.py
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 canary-file/
@@ -84,16 +84,16 @@ canary-file/
 
 ---
 
-## 🔔 Alert Example (Telegram)
+## Alert Example (Telegram)
 
 ```
-🚨 CANARY FILE TRIGGERED 🚨
+CANARY FILE TRIGGERED 
 
-🔴 Severity: HIGH
+Severity: HIGH
 
-📄 File: passwords.txt
-⚡ Event: COPIED
-🕐 Time: 2026-05-31 14:35:22
+File: passwords.txt
+Event: COPIED
+Time: 2026-05-31 14:35:22
 
 💻 Device: DESKTOP-PC01
 👤 User: john.doe
@@ -101,12 +101,12 @@ canary-file/
 🖥️ OS: Windows 11
 ⚙️ Process: explorer.exe
 
-📍 Destination: D:/USB/passwords.txt
+Destination: D:/USB/passwords.txt
 ```
 
 ---
 
-## 🧰 Tech Stack
+## Tech Stack
 
 | Component    | Technology              |
 |-------------|-------------------------|
