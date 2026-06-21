@@ -8,6 +8,8 @@ Makefile.in
 /ylwrap
 .deps/
 .dirstamp
+data/snapshots/*
+!data/snapshots/.gitkeep
 
 # http://www.gnu.org/software/autoconf
 
